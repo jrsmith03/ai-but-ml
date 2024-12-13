@@ -72,7 +72,10 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-
+    The number of connected components in the binary image is counted using BFS. 
+    A connected component is a region connecting pixels that have the same value (0 or 1).
+    It's useful in the sense that a digit like "1" might or should have fewer connected 
+    components than a more complex digit like "8" or "3
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
@@ -166,8 +169,41 @@ def enhancedPacmanFeatures(state, action):
     """
     features = util.Counter()
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    successor = state.generateSuccessor(0, action)
+    pacmanPosition = successor.getPacmanPosition()
+    food = successor.getFood()
+    ghosts = successor.getGhostPositions()
+    capsules = successor.getCapsules()
+
+    # Distance to closest food
+    foodDistances = [util.manhattanDistance(pacmanPosition, foodPos) for foodPos in food.asList()]
+    if foodDistances:
+        features['nearestFoodDistance'] = min(foodDistances)
+    else:
+        features['nearestFoodDistance'] = 0  # No food left
+
+    # look @ the distances to the foods that pacman will EVENTUALLY be able to eat
+    nextFoodDistances = [util.manhattanDistance(successor.getPacmanPosition(), foodPos) for foodPos in state.getFood().asList()]    
+    if len(nextFoodDistances) > 0:
+        features['foodMin'] = min(nextFoodDistances)
+    else: 
+        features['foodMin'] = 0
+
+    # Distance to the nearest power capsule
+    capsuleDistances = [util.manhattanDistance(pacmanPosition, capsulePos) for capsulePos in capsules]
+    if capsuleDistances:
+        features['nearestCapsuleDistance'] = min(capsuleDistances)
+    else:
+        features['nearestCapsuleDistance'] = 80
+
+    # Whether a power capsule is within 3 steps
+    nearbyCapsules = [capsule for capsule, dist in zip(capsules, capsuleDistances) if dist <=5]
+    features['nearbyCapsules'] = len(nearbyCapsules)
+
+    successor = state.generateSuccessor(0, action)
+    features['score'] = successor.getScore()
     return features
+
 
 
 def contestFeatureExtractorDigit(datum):

@@ -50,13 +50,13 @@ class PerceptronClassifierPacman(PerceptronClassifier):
             for i in range(len(trainingData)):
                 "*** YOUR CODE HERE ***"
                 true_label = trainingLabels[i]
-
                 # Calculate scores for all labels
                 # The labels, obviously, are stored in the data point.
                 # It took me far too long to realize that. Python Zen (TM)
                 scores = util.Counter()
 
                 for label in trainingData[i][1]:
+
                     scores[label] = self.weights * trainingData[i][0][label]
 
                 predicted_label = scores.argMax()
