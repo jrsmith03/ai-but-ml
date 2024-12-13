@@ -81,7 +81,7 @@ def enhancedFeatureExtractorDigit(datum):
     features =  basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
-    features += connectedComponents(datum.getPixels)
+    features += connectedComponents(datum.getPixels())
 
     return features
 
