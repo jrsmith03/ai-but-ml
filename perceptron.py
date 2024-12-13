@@ -49,31 +49,29 @@ class PerceptronClassifier:
 
         self.features = list(trainingData[0].keys()) # could be useful later
         # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
-        # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
+        # THE AUTOGRADER WILL LIKELY DEDUCT POINTS
 
         for iteration in range(self.max_iterations):
             print("Starting iteration ", iteration, "...")
-            max_score = 0
-            max_label = None
+
             for i in range(len(trainingData)):
-                # Walk all the features of this data point
-                for i in range(0, len(trainingData[0][i])) :
-                    feature_score = trainingData[0][i] * self.weights[i]
-                    if (feature_score > max_score):
-                        max_score = feature_score
-                        max_label = trainingData[1][i] # Store the predictor label for this feature
-                prediction_weight = self.weights[max_label]
-                
-                # Update the weights, if necessary.
-                true_label = trainingLabels[trainingData[0][i]]
-                if (max_label != true_label) :
-                    self.weight[true_label] = self.weight[true_label] + trainingData[0][i]
-                    self.weight[max_label] = self.weight[max_label] - trainingData[0][i]
+                true_label = trainingLabels[i]
 
+                # Calculate scores for all labels
+                scores = util.Counter()
+                for label in self.legalLabels:
+                    scores[label] = self.weights[label] * trainingData[i]
 
+                predicted_label = scores.argMax()
 
+                # Update the weights if incorrect prediction
+                if (predicted_label != true_label) :
+                    self.weights[true_label] += trainingData[i]
+                    self.weights[predicted_label] -= trainingData[i]
 
-
+        # weights = self.weights[label].items()
+        # sorted_features = sorted(weights.values())
+        # print(sorted_features)
     def classify(self, data ):
         """
         Classifies each datum as the label that most closely matches the prototype vector
@@ -97,6 +95,15 @@ class PerceptronClassifier:
         featuresWeights = []
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Access the weights for the given label
+        weights = self.weights[label]
+        
+        # Take the top 100 features
+        sorted_features = sorted(weights.items(), key=lambda item: item[1], reverse=True)
 
-        return featuresWeights
+        # Extract the top 100 features
+        top_100_features = [feature for feature, weight in sorted_features[:100]]
+
+        return top_100_features
+    
+

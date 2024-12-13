@@ -41,13 +41,26 @@ class PerceptronClassifierPacman(PerceptronClassifier):
         return guesses
 
 
-    def train( self, trainingData, trainingLabels, validationData, validationLabels ):
+    def train(self, trainingData, trainingLabels, validationData, validationLabels ):
         self.features = list(trainingData[0][0]['Stop'].keys()) # could be useful later
         # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
         # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
-
         for iteration in range(self.max_iterations):
             print("Starting iteration ", iteration, "...")
             for i in range(len(trainingData)):
                 "*** YOUR CODE HERE ***"
-                util.raiseNotDefined()
+                true_label = trainingLabels[i]
+
+                # Calculate scores for all labels
+                # The labels, obviously, are stored in the data point.
+                # It took me far too long to realize that. Python Zen (TM)
+                scores = util.Counter()
+
+                for label in trainingData[i][1]:
+                    scores[label] = self.weights * trainingData[i][0][label]
+
+                predicted_label = scores.argMax()
+          
+                if (predicted_label != true_label) :
+                    self.weights += trainingData[i][0][true_label]
+                    self.weights -= trainingData[i][0][predicted_label]

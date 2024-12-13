@@ -78,7 +78,49 @@ def enhancedFeatureExtractorDigit(datum):
     features =  basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    features += connectedComponents(datum.getPixels)
+
+    return features
+
+def connectedComponents(pixels):
+    def bfs(x, y):
+        # BFS helper function to find # of connected components
+        queue = util.Queue()
+        queue.push((x, y))
+        visited[x][y] = True
+
+        # Directions for the 4 connected neighbors [up, down, left, right]
+        xdir, ydir = [0, 0, 1, -1], [1, -1, 0, 0]
+
+        while not queue.isEmpty():
+            cx, cy = queue.pop()
+            # Explore the 4 neighbor pixels (up, down, left, right)
+            for dx, dy in zip(xdir, ydir):
+                nx, ny = cx + dx, cy + dy
+                # Checks if the new position is within bounds and matches the value
+                if 0 <= nx < row and 0 <= ny < col and not visited[nx][ny] and pixels[nx][ny] == 0:
+                    visited[nx][ny] = True
+                    queue.push((nx, ny))
+
+    features = util.Counter() 
+    row, col = DIGIT_DATUM_WIDTH, DIGIT_DATUM_HEIGHT
+    
+    visited = []
+    for i in range(row):
+        visited_row = [False] * col
+        visited.append(visited_row)
+    
+    # Count connected components
+    connected_components = 0
+    for i in range(row):
+        for j in range(col):
+            if not visited[i][j] and pixels[i][j] == 0:
+                bfs(i, j) 
+                connected_components += 1
+
+    # max 3 connected components to prevent overfitting
+    for i in range(3):
+        features[i] = 1 if connected_components == i else 0
 
     return features
 
